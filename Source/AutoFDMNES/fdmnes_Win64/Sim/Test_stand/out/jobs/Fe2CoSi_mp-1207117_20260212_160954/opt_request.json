@@ -1,0 +1,15 @@
+{
+  "type": "digital_twin_optimization",
+  "job_dir": "G:/Github/SpecTwin/Source/AutoFDMNES/fdmnes_Win64/Sim/Test_stand/out/jobs/Fe2CoSi_mp-1207117_20260212_160954",
+  "peaks_file": "G:/Github/SpecTwin/Source/AutoFDMNES/fdmnes_Win64/Sim/Test_stand/out/jobs/Fe2CoSi_mp-1207117_20260212_160954/peaks_selected.json",
+  "peaks": [
+    {
+      "energy_eV": 7701.0,
+      "intensity": 0.005640493
+    },
+    {
+      "energy_eV": 7706.0,
+      "intensity": 0.018078391
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+! Fdmnes indata file
+! Calculation of Bismuth photoemission in Bi2O3.
+! The convolution is performed on a spectra already calculated in a previous step.
+
+ Calculation
+   G:\Github\AutoFDMNES\Source\fdmnes_Win64\Sim\Test_stand\out\Bi2O3_calc_6.txt
+
+ Conv_out
+   G:\Github\AutoFDMNES\Source\fdmnes_Win64\Sim\Test_stand\out\Bi2O3_photon_conv_calc.txt
+
+ Convolution
+ 
+ Photoemission
+
+ Gaussian
+ 1.0
+
+ !Gamma_hole
+ ! 0.7
+
+
+
+ End
+
+

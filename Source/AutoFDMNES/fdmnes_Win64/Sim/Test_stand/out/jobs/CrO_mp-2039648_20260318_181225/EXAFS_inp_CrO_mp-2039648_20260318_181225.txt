@@ -1,0 +1,41 @@
+! Fdmnes indata file
+! Calculation for the Bismuth L3-edge in Bi
+! Finite difference method calculation with convolution
+
+! Comment
+! Photoemission in Bi
+ Filout
+   C:/Users/cakir/Desktop/SpecTwin_new/Source/AutoFDMNES/fdmnes_Win64/Sim/Test_stand/out/jobs/CrO_mp-2039648_20260318_181225/out/out
+
+ Range                        ! Energy range of calculation (eV)
+   -50.0 0.5 -2.0 0.10000000149011612 10.0 0.5 100.0
+ !-90. 0.2  0. 0.5 10. 1. 20.  ! first energy, step, intermediary energy, step ..., last energy    
+ 
+ Edge
+   K
+
+ Eimag
+   0.5
+
+ Density
+ Denstiy_all
+ Quadrupole
+
+ Energpho ! show x axis (photon energy) 
+
+
+ Radius                       ! Radius of the cluster where final state calculation is performed
+   6.0
+
+ Z_absorber
+   24
+
+ Cif_file
+   C:/Users/cakir/Desktop/SpecTwin_new/Source/AutoFDMNES/fdmnes_Win64/Sim/Test_stand/in/CrO_mp-2039648.cif
+
+ Convolution 
+
+ Density_all
+ End
+
+

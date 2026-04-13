@@ -1,0 +1,2 @@
+ 1
+C:/Users/cakir/Desktop/SpecTwin_new/Source/AutoFDMNES/fdmnes_Win64/Sim/Test_stand/out/jobs/Nb2O5_mp-581967_20260327_105702/XES_inp_Nb2O5_mp-581967_20260327_105702.txt

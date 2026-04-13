@@ -1,0 +1,40 @@
+{
+  "job_key": "Fe2CoSi_mp-1207117",
+  "run_key": "Fe2CoSi_mp-1207117_20260212_135451",
+  "calc_type": "XAFS",
+  "out_file": "out",
+  "range": [
+    {
+      "start": -150.0,
+      "step": 0.5,
+      "stop": -2.0
+    },
+    {
+      "start": -2.0,
+      "step": 0.10000000149011612,
+      "stop": 10.0
+    },
+    {
+      "start": 10.0,
+      "step": 0.5,
+      "stop": 150.0
+    }
+  ],
+  "edge": "K",
+  "eimag": 0.5,
+  "green": true,
+  "density": true,
+  "quadrupole": false,
+  "energpho": null,
+  "radius": 3.0,
+  "z_absorber": 27,
+  "cif_file": "G:\\Github\\SpecTwin\\Source\\AutoFDMNES\\fdmnes_Win64\\Sim\\Test_stand\\in\\Fe2CoSi_mp-1207117.cif",
+  "convolution": {
+    "gaussian": 1.0,
+    "gamma_hole": 0.699999988079071
+  },
+  "enable_xes": true,
+  "xes": {
+    "output_file": "photon_conv_calc.txt"
+  }
+}

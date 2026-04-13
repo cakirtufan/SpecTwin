@@ -1,0 +1,17 @@
+ FDMNES program, Revision 24th of November 2023    
+   Date = 12 02 2026                              
+   Time = 15 h 27 mn 54 s                         
+
+
+ Error opening the file:
+
+   Nd2FeCo17Si8_mp-1220467.cif                                                                                                                                                                                                                                             
+
+          Status =   29
+
+          It does not exist or 
+          it is not in the good directory or
+          there is some bad spelling or
+          the line contains some extra hidden character !
+
+
