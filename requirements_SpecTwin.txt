@@ -1,0 +1,13 @@
+dearpygui
+numpy
+pandas
+scipy
+matplotlib
+plotly
+pillow
+h5py
+silx
+scikit-optimize
+xraydb
+xrt
+mp-api
