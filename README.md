@@ -12,6 +12,20 @@ The repository is currently structured as a desktop application and is mainly in
 
 ---
 
+## Video demos
+
+The following videos show the main workflows currently implemented in SpecTwin:
+
+### XES simulation workflow
+[![XES simulation workflow](https://img.youtube.com/vi/jMjhRHJ3Juo/0.jpg)](https://www.youtube.com/watch?v=jMjhRHJ3Juo)
+
+Demonstration of the XES simulation workflow implemented in the AutoFDMNES module.
+
+### Digital Twin workflow
+[![Digital Twin workflow](https://img.youtube.com/vi/hH9EX2Ia6WU/0.jpg)](https://www.youtube.com/watch?v=hH9EX2Ia6WU)
+
+Demonstration of the digital twin workflow for simulation-driven spectrometer setup and optimization.
+
 ## Repository structure
 
 ```text
