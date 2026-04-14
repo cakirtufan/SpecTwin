@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="Source/img/spectwin_logo.png" alt="SpecTwin logo" width="850">
+</p>
+
 # SpecTwin
 
 SpecTwin is a modular Python application for X-ray emission spectroscopy workflows. It combines:
