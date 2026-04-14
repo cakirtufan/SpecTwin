@@ -217,7 +217,11 @@ Source/AutoFDMNES/fdmnes_Win64/
 
 The AutoFDMNES module uses the Materials Project API for CIF retrieval.
 
-The key need to enter in mpr.py under AutoFDMNES folder
+The key need to enter in mpr.py
+
+```text
+Source/AutoFDMNES/mpr.py
+```
 
 ---
 
