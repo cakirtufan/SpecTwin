@@ -210,15 +210,12 @@ This repository includes Windows-specific FDMNES binaries under:
 Source/AutoFDMNES/fdmnes_Win64/
 ```
 
-If you move the repository, keep this internal folder structure unchanged, otherwise file paths inside the application may break.
 
 ---
 
 ## Materials Project API
 
 The AutoFDMNES module uses the Materials Project API for CIF retrieval.
-
-Before publishing this repository publicly, check whether any API key is hard-coded in the source code and remove it if necessary. A safer approach is to read the key from an environment variable.
 
 ---
 
@@ -244,20 +241,5 @@ Check that `fdmnes_win64.exe` exists in:
 Source/AutoFDMNES/fdmnes_Win64/
 ```
 
----
-
-## Suggested next improvements for the repository
-
-For a cleaner public GitLab repository, the following would be useful:
-
-- add a pinned `requirements.txt`
-- add a `.gitignore`
-- move secrets/API keys out of source files
-- document example input/output datasets
-- add screenshots of the GUI
-
----
 
 ## Citation / acknowledgement
-
-If you use this software in academic work, add the appropriate citation or acknowledgement information here.
