@@ -25,4 +25,9 @@ Source/results/
 Source/AutoFDMNES/fdmnes_Win64/Sim/*/out/
 Source/AutoFDMNES/fdmnes_Win64/Sim/*/in/*.cif
 Source/AutoFDMNES/fdmnes_Win64/Sim/*/jobs/
+Source/bo_seed_*.json
+Source/random_seed_*.json
+Source/dpg_plot_export.json
+Source/grid_search_results.json
+Source/histogram_1dx_output.csv
 optimization_results.json

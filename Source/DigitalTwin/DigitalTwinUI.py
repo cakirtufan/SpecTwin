@@ -50,192 +50,238 @@ class DigitalTwinUI:
             with dpg.texture_registry(tag="texture_reg", show=False):
                 pass
 
-        with dpg.group(horizontal=True, parent=self.parent):
+        with dpg.tab_bar(parent=self.parent, tag="digital_twin_tabs"):
+            with dpg.tab(label="Lines", tag="digital_twin_tab_lines"):
+                self._build_lines_tab()
 
-            with dpg.group(horizontal=False):
+            with dpg.tab(label="Simulation", tag="digital_twin_tab_simulation"):
+                self._build_simulation_setup_tab()
 
-                with dpg.group(horizontal=True):
+            with dpg.tab(label="Optimization", tag="digital_twin_tab_optimization"):
+                self._build_optimization_tab()
 
-                    # ==========================================================
-                    # Element Selection
-                    # ==========================================================
-                    with dpg.child_window(width=550, height=360, border=True):
-                        dpg.add_text("Element Selection")
-                        self.element_combo = dpg.add_combo(
-                            self.xray_db.get_elements(),
-                            label="Element",
-                            callback=self.update_shells
-                        )
-                        self.shell_combo = dpg.add_combo([], label="Shell", callback=self.update_lines)
-                        self.line_listbox = dpg.add_listbox([], label="Lines", num_items=4)
-
-                        with dpg.group(horizontal=True):
-                            dpg.add_button(label="Add Line (Sim)", callback=self.add_line_sim)
-                            dpg.add_button(label="Add Line (Opt)", callback=self.add_line_opt)
-
-                        with dpg.group(horizontal=True):
-                            dpg.add_button(label="Clear Sim Energies", callback=self.clear_sim_energies)
-                            dpg.add_button(label="Clear Opt Energies", callback=self.clear_opt_energies)
-                            dpg.add_button(label="Deselect All", callback=self.deselect_all)
-
-                        self.result_text_sim = dpg.add_input_text(
-                            multiline=True, readonly=True, width=500, height=80,
-                            label="Simulation Energies"
-                        )
-                        self.result_text_opt = dpg.add_input_text(
-                            multiline=True, readonly=True, width=500, height=80,
-                            label="Optimization Energies"
-                        )
-
-                    # ==========================================================
-                    # Crystal Selection
-                    # ==========================================================
-                    with dpg.child_window(width=550, height=360, border=True):
-                        dpg.add_text("Crystal Selection")
-
-                        self.crystal_combo_sim = dpg.add_combo(self.crystals.crystals, label="Crystal")
-                        self.hkl_input_sim = dpg.add_input_text(
-                            label="hkl (e.g. 1,1,1)",
-                            default_value="1,1,1"
-                        )
-
-                        self.crystal_info = dpg.add_input_text(
-                            multiline=True,
-                            readonly=True,
-                            width=500,
-                            height=80,
-                            label="Crystal Info"
-                        )
-
-                        dpg.add_button(label="Select Crystal", callback=self.display_crystal_info)
-
-                        self.distance_input = dpg.add_input_float(label="Distance", default_value=110.0)
-                        self.num_rep_input = dpg.add_input_int(
-                            label="Repeats (xrt iterations)",
-                            default_value=1500,
-                            min_value=1
-                        )
-
-                        dpg.add_button(label="Run Simulation", callback=self.run_simulation)
-
-                    # ==========================================================
-                    # Optimization Parameters and Run
-                    # ==========================================================
-                    with dpg.child_window(width=600, height=360, border=True):
-                        dpg.add_text("Optimization Parameters and Run")
-
-                        self.distance_boundary_start = dpg.add_input_float(
-                            label="Starting Distance",
-                            default_value=110.0
-                        )
-                        self.distance_boundary_stop = dpg.add_input_float(
-                            label="End Distance",
-                            default_value=140.0
-                        )
-
-                        self.crystal_combo_opt = dpg.add_combo(self.crystals.crystals, label="Crystal")
-                        self.hkl_input_opt = dpg.add_input_text(
-                            label="hkl (e.g. 1,1,1)",
-                            default_value="1,1,1"
-                        )
-
-                        self.opt_repeats_input = dpg.add_input_int(
-                            label="Repeats (xrt iterations)",
-                            default_value=1500,
-                            min_value=1
-                        )
-
-                        self.opt_calls_input = dpg.add_input_int(
-                            label="n_calls",
-                            default_value=15,
-                            min_value=1
-                        )
-
-                        dpg.add_separator()
-
-                        self.optimization_method_combo = dpg.add_combo(
-                            items=["Bayesian Optimization", "Random Search", "Grid Search"],
-                            default_value="Bayesian Optimization",
-                            label="Optimization Method"
-                        )
-
-                        self.seed_input = dpg.add_input_text(
-                            label="Seeds",
-                            default_value="0,1,2,3,4,42,123,456,789,1234",
-                            hint="Comma-separated, e.g. 0,1,2,42"
-                        )
-
-                        self.bo_acq_combo = dpg.add_combo(
-                            items=["LCB", "EI", "PI", "gp_hedge"],
-                            default_value="LCB",
-                            label="BO acquisition"
-                        )
-
-                        self.bo_kappa_input = dpg.add_input_float(
-                            label="BO kappa",
-                            default_value=1.96
-                        )
-
-                        self.bo_n_initial_input = dpg.add_input_int(
-                            label="BO n_initial_points",
-                            default_value=5,
-                            min_value=1
-                        )
-
-                        self.opt_hint_text = dpg.add_text("", color=(200, 200, 50), wrap=560)
-                        self.run_status_text = dpg.add_text("Status: idle", color=(180, 180, 180), wrap=560)
-
-                        dpg.add_separator()
-                        dpg.add_text("Extra target energies")
-                        self.manual_energy_input = dpg.add_input_text(
-                            label="Manual energies (eV)",
-                            default_value="",
-                            hint="Comma-separated, e.g. 6404.1, 7058.0"
-                        )
-
-                        with dpg.group(horizontal=True):
-                            dpg.add_button(label="Add Manual Energies", callback=self.add_manual_energies)
-                            dpg.add_button(label="Clear Opt Energies", callback=self.clear_opt_energies)
-
-                        with dpg.group(horizontal=True):
-                            dpg.add_button(
-                                label="Load peaks (AutoFDMNES)",
-                                callback=self.load_peaks_and_start_optimization
-                            )
-                            dpg.add_button(
-                                label="Clear Opt Selections",
-                                callback=self.clear_opt_selections
-                            )
-
-                        dpg.add_separator()
-                        dpg.add_text("Crystal/HKL selections for optimization")
-
-                        self.selection_text = dpg.add_text("No selections yet", wrap=560)
-
-                        dpg.add_button(label="Add Selection", callback=self.add_selection_callback)
-
-                        with dpg.group(horizontal=True):
-                            dpg.add_button(label="Run Optimization", callback=self.run_optimization)
-                            dpg.add_button(label="Run Optimization (Thread)", callback=self.run_optimization_threaded)
-
-                        dpg.add_separator()
-                        self.seed_summary_text = dpg.add_input_text(
-                            label="Run Summary",
-                            multiline=True,
-                            readonly=True,
-                            width=560,
-                            height=80
-                        )
-
-                # ==============================================================
-                # Graph Area
-                # ==============================================================
-                with dpg.child_window(width=-1, height=650, border=True, tag="graph_window"):
-                    dpg.add_text("Graph")
+            with dpg.tab(label="Results", tag="digital_twin_tab_results"):
+                self._build_results_tab()
 
     # ------------------------------------------------------------------
     # UI helpers
     # ------------------------------------------------------------------
+    def _build_lines_tab(self):
+        dpg.add_spacer(height=8)
+        with dpg.group(horizontal=True):
+            with dpg.child_window(width=500, height=560, border=False):
+                dpg.add_text("Select Emission Lines")
+                dpg.add_separator()
+                self.element_combo = dpg.add_combo(
+                    self.xray_db.get_elements(),
+                    label="Element",
+                    callback=self.update_shells
+                )
+                self.shell_combo = dpg.add_combo([], label="Shell", callback=self.update_lines)
+                self.line_listbox = dpg.add_listbox([], label="Lines", num_items=6)
+
+                dpg.add_separator()
+                dpg.add_text("Route selected lines")
+
+                with dpg.group(horizontal=True):
+                    dpg.add_button(label="Simulate", width=120, callback=self.add_line_sim)
+                    dpg.add_button(label="Optimize", width=120, callback=self.add_line_opt)
+
+                with dpg.group(horizontal=True):
+                    dpg.add_button(label="Clear Sim", callback=self.clear_sim_energies)
+                    dpg.add_button(label="Clear Opt", callback=self.clear_opt_energies)
+                    dpg.add_button(label="Deselect", callback=self.deselect_all)
+
+            with dpg.child_window(width=24, height=560, border=False):
+                dpg.add_spacer(width=12)
+
+            with dpg.child_window(width=540, height=560, border=False):
+                dpg.add_text("Simulation Line Set")
+                dpg.add_separator()
+
+                self.result_text_sim = dpg.add_input_text(
+                    multiline=True,
+                    readonly=True,
+                    width=520,
+                    height=430,
+                    label="Lines used for xrt simulation"
+                )
+
+            with dpg.child_window(width=24, height=560, border=False):
+                dpg.add_spacer(width=12)
+
+            with dpg.child_window(width=540, height=560, border=False):
+                dpg.add_text("Optimization Target Set")
+                dpg.add_separator()
+                self.result_text_opt = dpg.add_input_text(
+                    multiline=True,
+                    readonly=True,
+                    width=520,
+                    height=430,
+                    label="Lines optimized / matched"
+                )
+
+    def _build_simulation_setup_tab(self):
+        dpg.add_spacer(height=8)
+        with dpg.group(horizontal=True):
+            with dpg.child_window(width=560, height=520, border=False):
+                dpg.add_text("Spectrometer Setup")
+                dpg.add_separator()
+
+                self.crystal_combo_sim = dpg.add_combo(self.crystals.crystals, label="Crystal")
+                self.hkl_input_sim = dpg.add_input_text(
+                    label="hkl",
+                    default_value="1,1,1",
+                    hint="e.g. 1,1,1"
+                )
+
+                self.crystal_info = dpg.add_input_text(
+                    multiline=True,
+                    readonly=True,
+                    width=520,
+                    height=130,
+                    label="Crystal Info"
+                )
+
+                dpg.add_button(label="Preview Crystal", callback=self.display_crystal_info)
+                dpg.add_separator()
+
+                self.distance_input = dpg.add_input_float(label="Distance", default_value=110.0)
+                self.num_rep_input = dpg.add_input_int(
+                    label="Repeats (xrt iterations)",
+                    default_value=1500,
+                    min_value=1
+                )
+
+                dpg.add_button(label="Run Simulation", width=180, callback=self.run_simulation)
+
+            with dpg.child_window(width=28, height=520, border=False):
+                dpg.add_spacer(width=12)
+
+            with dpg.child_window(width=-1, height=520, border=False):
+                dpg.add_text("Simulation Output")
+                dpg.add_separator()
+                dpg.add_text("Use the Lines tab first, then run a simulation to populate the Results tab.", color=(150, 150, 150), wrap=520)
+
+    def _build_optimization_tab(self):
+        dpg.add_spacer(height=8)
+        with dpg.group(horizontal=True):
+            with dpg.child_window(width=420, height=560, border=False):
+                dpg.add_text("Search Space")
+                dpg.add_separator()
+                self.distance_boundary_start = dpg.add_input_float(
+                    label="Start Distance",
+                    default_value=110.0
+                )
+                self.distance_boundary_stop = dpg.add_input_float(
+                    label="End Distance",
+                    default_value=140.0
+                )
+
+                self.crystal_combo_opt = dpg.add_combo(self.crystals.crystals, label="Crystal")
+                self.hkl_input_opt = dpg.add_input_text(
+                    label="hkl",
+                    default_value="1,1,1",
+                    hint="e.g. 1,1,1"
+                )
+
+                dpg.add_button(label="Add Crystal/HKL", callback=self.add_selection_callback)
+                dpg.add_separator()
+                self.selection_text = dpg.add_text("No selections yet", wrap=380)
+                dpg.add_button(label="Clear Search Space", callback=self.clear_opt_selections)
+
+            with dpg.child_window(width=24, height=560, border=False):
+                dpg.add_spacer(width=12)
+
+            with dpg.child_window(width=480, height=560, border=False):
+                dpg.add_text("Target Energies")
+                dpg.add_separator()
+                self.manual_energy_input = dpg.add_input_text(
+                    label="Manual energies (eV)",
+                    default_value="",
+                    hint="Comma-separated, e.g. 6404.1, 7058.0"
+                )
+
+                with dpg.group(horizontal=True):
+                    dpg.add_button(label="Add Manual", callback=self.add_manual_energies)
+                    dpg.add_button(label="Clear Targets", callback=self.clear_opt_energies)
+
+                dpg.add_button(
+                    label="Load AutoFDMNES Peaks",
+                    callback=self.load_peaks_and_start_optimization
+                )
+                dpg.add_separator()
+                dpg.add_text("Selected optimization energies are listed on the Simulation tab.", color=(150, 150, 150), wrap=440)
+                self.opt_hint_text = dpg.add_text("", color=(200, 200, 50), wrap=440)
+
+            with dpg.child_window(width=24, height=560, border=False):
+                dpg.add_spacer(width=12)
+
+            with dpg.child_window(width=540, height=560, border=False):
+                dpg.add_text("Optimizer Settings")
+                dpg.add_separator()
+                self.optimization_method_combo = dpg.add_combo(
+                    items=["Bayesian Optimization", "Random Search", "Grid Search"],
+                    default_value="Bayesian Optimization",
+                    label="Method"
+                )
+
+                self.opt_repeats_input = dpg.add_input_int(
+                    label="Repeats (xrt iterations)",
+                    default_value=1500,
+                    min_value=1
+                )
+
+                self.opt_calls_input = dpg.add_input_int(
+                    label="n_calls",
+                    default_value=15,
+                    min_value=1
+                )
+
+                self.seed_input = dpg.add_input_text(
+                    label="Seeds",
+                    default_value="0,1,2,3,4,42,123,456,789,1234",
+                    hint="Comma-separated, e.g. 0,1,2,42"
+                )
+
+                dpg.add_separator()
+                self.bo_acq_combo = dpg.add_combo(
+                    items=["LCB", "EI", "PI", "gp_hedge"],
+                    default_value="LCB",
+                    label="BO acquisition"
+                )
+                self.bo_kappa_input = dpg.add_input_float(
+                    label="BO kappa",
+                    default_value=1.96
+                )
+                self.bo_n_initial_input = dpg.add_input_int(
+                    label="BO n_initial_points",
+                    default_value=5,
+                    min_value=1
+                )
+
+                dpg.add_separator()
+                self.run_status_text = dpg.add_text("Status: idle", color=(180, 180, 180), wrap=520)
+
+                with dpg.group(horizontal=True):
+                    dpg.add_button(label="Run Optimization", width=180, callback=self.run_optimization_threaded)
+                    dpg.add_button(label="Run in Foreground", callback=self.run_optimization)
+
+                self.seed_summary_text = dpg.add_input_text(
+                    label="Run Summary",
+                    multiline=True,
+                    readonly=True,
+                    width=520,
+                    height=120
+                )
+
+    def _build_results_tab(self):
+        dpg.add_spacer(height=8)
+        with dpg.child_window(width=-1, height=650, border=False, tag="graph_window"):
+            dpg.add_text("Results")
+            dpg.add_separator()
+            dpg.add_text("No simulation or optimization result yet.", color=(150, 150, 150), wrap=600)
+
     def add_selection_callback(self):
         crystal = dpg.get_value(self.crystal_combo_opt)
         if not crystal:
@@ -410,37 +456,47 @@ class DigitalTwinUI:
         with dpg.window(
             label="Optimization Convergence",
             tag="conv_window",
-            width=760,
-            height=420,
+            width=1120,
+            height=760,
             pos=(50, 50),
             on_close=lambda: dpg.hide_item("conv_window")
         ):
-            dpg.add_text("Method: -", tag="conv_method_txt")
-            dpg.add_text("Seed: -", tag="conv_seed_txt")
+            dpg.add_text("Optimization Convergence")
             dpg.add_separator()
 
-            with dpg.plot(label="Convergence", height=220, width=-1, tag="conv_plot"):
+            with dpg.group(horizontal=True):
+                dpg.add_text("Method: -", tag="conv_method_txt")
+                dpg.add_spacer(width=24)
+                dpg.add_text("Seed: -", tag="conv_seed_txt")
+
+            dpg.add_spacer(height=8)
+
+            with dpg.plot(label="Objective by Iteration", height=420, width=-1, tag="conv_plot"):
                 dpg.add_plot_legend()
                 dpg.add_plot_axis(dpg.mvXAxis, label="Iteration", tag="conv_xaxis")
                 dpg.add_plot_axis(dpg.mvYAxis, label="Objective", tag="conv_yaxis")
                 dpg.add_line_series([], [], label="Current", parent="conv_yaxis", tag="conv_series_current")
                 dpg.add_line_series([], [], label="Best so far", parent="conv_yaxis", tag="conv_series_best")
 
-            dpg.add_spacer(height=8)
+            dpg.add_spacer(height=12)
             dpg.add_separator()
-            dpg.add_spacer(height=8)
+            dpg.add_spacer(height=10)
 
             dpg.add_text("Best result:")
-            dpg.add_text("Best distance : -", tag="best_distance_txt")
-            dpg.add_text("Best crystal  : -", tag="best_crystal_txt")
-            dpg.add_text("Best hkl      : -", tag="best_hkl_txt")
-            dpg.add_text("Visible peaks : -", tag="best_visible_txt")
-            dpg.add_text("Chosen peaks  : -", tag="best_chosen_txt")
-            dpg.add_text("deltaX (px)   : -", tag="best_deltax_txt")
-            dpg.add_text("pixel_diff    : -", tag="best_pixeldiff_txt")
-            dpg.add_text("coverage      : -", tag="best_coverage_txt")
-            dpg.add_text("score         : -", tag="best_score_txt")
-            dpg.add_text("objective     : -", tag="best_obj_txt")
+            with dpg.group(horizontal=True):
+                with dpg.child_window(width=520, height=210, border=False):
+                    dpg.add_text("Best distance : -", tag="best_distance_txt", wrap=500)
+                    dpg.add_text("Best crystal  : -", tag="best_crystal_txt", wrap=500)
+                    dpg.add_text("Best hkl      : -", tag="best_hkl_txt", wrap=500)
+                    dpg.add_text("deltaX (px)   : -", tag="best_deltax_txt", wrap=500)
+                    dpg.add_text("pixel_diff    : -", tag="best_pixeldiff_txt", wrap=500)
+
+                with dpg.child_window(width=-1, height=210, border=False):
+                    dpg.add_text("Visible peaks : -", tag="best_visible_txt", wrap=520)
+                    dpg.add_text("Chosen peaks  : -", tag="best_chosen_txt", wrap=520)
+                    dpg.add_text("coverage      : -", tag="best_coverage_txt", wrap=520)
+                    dpg.add_text("score         : -", tag="best_score_txt", wrap=520)
+                    dpg.add_text("objective     : -", tag="best_obj_txt", wrap=520)
 
     def _update_convergence(self, iter_idx, y_current, y_best):
         self._conv_x.append(int(iter_idx))

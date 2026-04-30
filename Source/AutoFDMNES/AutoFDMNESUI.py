@@ -16,7 +16,7 @@ from SimulationParamsDPG import SimulationParamsDPG
 from Xraydb import XrayDBHandler
 
 from fdmnes_executer import FDMNES_executer
-# from plot_ import PlotClass  # şimdilik run stabil olunca bağlarız
+# from plot_ import PlotClass
 
 
 class AutoFDMNESUI:
@@ -24,7 +24,7 @@ class AutoFDMNESUI:
         self.parent = parent_tag
         self.last_job_dir = None
 
-        # AutoFDMNES kökü (fdmnes_Win64 burada)
+        # AutoFDMNES root (fdmnes_Win64 lives here)
         self.auto_root = os.path.dirname(__file__)
 
         self.included_elements = []
@@ -43,12 +43,15 @@ class AutoFDMNESUI:
         self.xes_peak_table = None      # table tag
         self.xes_selected_row = -1      # selected row index
         self.xes_plot_handlers = "xes_plot_handlers"
+        if dpg.does_item_exist(self.xes_plot_handlers):
+            dpg.delete_item(self.xes_plot_handlers)
 
         with dpg.tab_bar(parent=self.parent, tag="autofdmnes_tabs"):
 
-            # --- Step 1 ---
-            with dpg.tab(label="Step 1: Periodic Table", tag="tab_pt"):
-                dpg.add_text("Select elements from the periodic table:")
+            # --- Materials ---
+            with dpg.tab(label="Materials", tag="tab_pt"):
+                dpg.add_text("Select elements")
+                dpg.add_separator()
                 self.pt = PeriodicTableDPG("tab_pt")
 
                 dpg.add_button(
@@ -58,19 +61,21 @@ class AutoFDMNESUI:
 
                 dpg.add_text("", tag="pt_warning", parent="tab_pt")
 
-            # --- Step 2 ---
-            with dpg.tab(label="Step 2: Edge Selection", tag="tab_edge"):
-                dpg.add_text("Select element edges and formulas:")
+            # --- Edges / CIF ---
+            with dpg.tab(label="Edges / CIF", tag="tab_edge"):
+                dpg.add_text("Select element edges and formulas")
+                dpg.add_separator()
                 self.edge_panel = None
 
-            # --- Step 3 ---
-            with dpg.tab(label="Step 3: Simulation Parameters", tag="tab_params"):
-                dpg.add_text("Set FDMNES simulation parameters and press Save.")
+            # --- Parameters ---
+            with dpg.tab(label="Parameters", tag="tab_params"):
+                dpg.add_text("Set FDMNES simulation parameters and save the job inputs")
+                dpg.add_separator()
                 self.param_panel = None
 
-            # --- Step 4 ---
-            with dpg.tab(label="Step 4: Run Simulation", tag="tab_sim"):
-                dpg.add_text("Run FDMNES simulation:")
+            # --- Run / Peaks ---
+            with dpg.tab(label="Run / Peaks", tag="tab_sim"):
+                dpg.add_text("Run FDMNES simulation")
                 dpg.add_button(
                     label="Run Simulation",
                     width=240,
@@ -79,24 +84,24 @@ class AutoFDMNESUI:
                 dpg.add_separator()
                 dpg.add_text("", tag="sim_status", parent="tab_sim")
 
-                dpg.add_spacer(height=8)
-                dpg.add_separator()
-                dpg.add_spacer(height=8)
+                dpg.add_spacer(height=12)
 
                 # --- Plots (side-by-side) ---
                 with dpg.group(horizontal=True, parent="tab_sim"):
 
                     # LEFT: XANES (convolved) plot
-                    with dpg.child_window(width=720, height=500, border=True):
+                    with dpg.child_window(width=760, height=620, border=False):
                         dpg.add_text("XANES (convolved): out_conv.txt")
-                        with dpg.plot(height=480, width=-1, tag="plot_exafs"):
+                        dpg.add_separator()
+                        with dpg.plot(height=560, width=-1, tag="plot_exafs"):
                             dpg.add_plot_axis(dpg.mvXAxis, label="Energy", tag="ax_exafs_x")
                             dpg.add_plot_axis(dpg.mvYAxis, label="Intensity", tag="ax_exafs_y")
 
                     # RIGHT: XES plot + peak picking
-                    with dpg.child_window(width=720, height=650, border=True):
+                    with dpg.child_window(width=-1, height=620, border=False):
                         dpg.add_text("XES: photon_conv_calc*.txt (Shift+Click to pick peak)")
-                        with dpg.plot(height=480, width=-1, tag="plot_xes"):
+                        dpg.add_separator()
+                        with dpg.plot(height=430, width=-1, tag="plot_xes"):
                             dpg.add_plot_axis(dpg.mvXAxis, label="Energy", tag="ax_xes_x")
                             dpg.add_plot_axis(dpg.mvYAxis, label="Intensity", tag="ax_xes_y")
 
@@ -132,7 +137,7 @@ class AutoFDMNESUI:
             return
         dpg.set_value("pt_warning", "")
 
-        # EdgeSelectionDPG'yi sadece 1 kere oluştur
+        # Create EdgeSelectionDPG once, then refresh it.
         if self.edge_panel is None:
             self.edge_panel = EdgeSelectionDPG(
                 parent="tab_edge",

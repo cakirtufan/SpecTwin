@@ -36,6 +36,10 @@ class CalibrationUI:
         self.hdf5_reader = None
         self.analyzer = XRFAnalyzer.XRFAnalyzer()
 
+        for tag in ["selected_scatter_theme", "align_green_theme", "plot_handler_registry"]:
+            if dpg.does_item_exist(tag):
+                dpg.delete_item(tag)
+
         self._build_layout()
 
     def _build_layout(self):

@@ -144,6 +144,8 @@ class MergeDataUI:
 
             # directory dialog
             self.dir_dialog_tag = f"{self.prefix}_dir_dialog"
+            if dpg.does_item_exist(self.dir_dialog_tag):
+                dpg.delete_item(self.dir_dialog_tag)
             with dpg.file_dialog(
                 directory_selector=True, show=False,
                 callback=self._dir_selected_callback,
@@ -365,6 +367,16 @@ class MergeDataUI:
 
     # ---------------- Helpers ----------------
     def _set_status(self, msg: str):
+        msg = str(msg)
+        replacements = {
+            "âš ï¸": "Warning:",
+            "âœ…": "Done:",
+            "âœ”": "included",
+            "âœ–": "excluded",
+            "&": "and",
+        }
+        for old, new in replacements.items():
+            msg = msg.replace(old, new)
         if dpg.does_item_exist(self.status_tag):
             dpg.set_value(self.status_tag, msg)
         else:

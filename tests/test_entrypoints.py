@@ -77,6 +77,55 @@ def test_digital_twin_can_be_reopened_without_losing_content():
 
             assert child_count > 0
             assert dpg.does_item_exist("texture_reg")
+            assert dpg.does_item_exist("digital_twin_tab_lines")
+            assert dpg.does_item_exist("digital_twin_tab_simulation")
+            assert dpg.does_item_exist("digital_twin_tab_optimization")
+            assert dpg.does_item_exist("digital_twin_tab_results")
             assert dpg.does_item_exist("graph_window")
+    finally:
+        dpg.destroy_context()
+
+
+def test_digital_twin_convergence_window_builds_large_layout():
+    spectwin_main = load_module("SpectwinMain_convergence", SOURCE_DIR / "SpectwinMain.py")
+
+    dpg.create_context()
+    try:
+        spectwin_main.build_main_window()
+
+        digital_twin = spectwin_main.DigitalTwinUI("content_area")
+        digital_twin._open_convergence_window()
+
+        assert dpg.does_item_exist("conv_window")
+        assert dpg.does_item_exist("conv_plot")
+        assert dpg.does_item_exist("conv_series_current")
+        assert dpg.does_item_exist("conv_series_best")
+        assert dpg.get_item_width("conv_window") >= 1000
+        assert dpg.get_item_height("conv_window") >= 700
+    finally:
+        dpg.destroy_context()
+
+
+def test_core_modules_can_be_reopened_without_duplicate_tags():
+    spectwin_main = load_module("SpectwinMain_reopen_modules", SOURCE_DIR / "SpectwinMain.py")
+
+    dpg.create_context()
+    try:
+        spectwin_main.build_main_window()
+
+        labels = [
+            "AutoFDMNES",
+            "VisualizeData",
+            "ProcessData",
+            "Merge .h5/.evt Files",
+            "SubPixelResolution",
+        ]
+
+        for _ in range(2):
+            for label in labels:
+                spectwin_main.show_main_content(label)
+                children = dpg.get_item_children("content_area")
+                child_count = sum(len(items) for items in children.values()) if children else 0
+                assert child_count > 0, label
     finally:
         dpg.destroy_context()
