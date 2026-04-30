@@ -10,7 +10,7 @@ import os
 
 class MPR:
     def __init__(self):
-        self.API_KEY = "s0sfFNfYiGN0Wb9VdmQOoI0I0dNCAegh"
+        self.API_KEY = "add mpr key here"
         self.mpids = []
         self.mpformulas = []
         
