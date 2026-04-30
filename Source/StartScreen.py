@@ -88,7 +88,7 @@ with dpg.window(tag="MainWindow", label="", width=800, height=600, no_title_bar=
         dpg.add_button(label="Launch SpecTwin", width=220, height=40, callback=launch_specwin)
 
 # === Show viewport ===
-icon_path = os.path.join(base_path_image, "spectwin_icon.ico")
+icon_path = base_path_image / "spectwin_icon.ico"
 dpg.create_viewport(
     title='SpecTwin',
     width=750,
