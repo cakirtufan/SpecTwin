@@ -5,12 +5,14 @@ Created on Fri May 16 10:04:37 2025
 @author: ccakir
 """
 
-import os, sys
+import os
+import sys
+from pathlib import Path
 import dearpygui.dearpygui as dpg
 import numpy as np
 
-cwd = os.getcwd()
-utils_path = os.path.join(cwd, "Utils")
+source_dir = Path(__file__).resolve().parents[1]
+utils_path = str(source_dir / "Utils")
 if utils_path not in sys.path:
     sys.path.append(utils_path)
 

@@ -34,19 +34,19 @@ Demonstration of the XES simulation workflow implemented in the AutoFDMNES modul
 
 ```text
 SpecTwin/
-├─ Source/
-│  ├─ SpectwinMain.py          # Main application window
-│  ├─ StartScreen.py           # Start screen / launcher
-│  ├─ AutoFDMNES/              # FDMNES-based material simulation module
-│  ├─ DigitalTwin/             # xrt-based digital twin module
-│  ├─ DataVisualization/       # plotting and visualization tools
-│  ├─ DataAlligning/           # data processing / alignment tools
-│  ├─ MergeData/               # merge utilities
-│  ├─ SubPixel/                # event/subpixel analysis tools
-│  ├─ fonts/
-│  └─ img/
-└─ xrt_update/
-   └─ screens.py               # patched xrt backend file
+|-- Source/
+|   |-- SpectwinMain.py          # Main application window
+|   |-- StartScreen.py           # Start screen / launcher
+|   |-- AutoFDMNES/              # FDMNES-based material simulation module
+|   |-- DigitalTwin/             # xrt-based digital twin module
+|   |-- DataVisualization/       # plotting and visualization tools
+|   |-- DataAlligning/           # data processing / alignment tools
+|   |-- MergeData/               # merge utilities
+|   |-- SubPixel/                # event/subpixel analysis tools
+|   |-- fonts/
+|   `-- img/
+`-- xrt_update/
+    `-- screens.py               # patched xrt backend file
 ```
 
 ---
@@ -88,14 +88,14 @@ cd SpecTwin
 
 ### 2. Create and activate a virtual environment
 
-#### Windows (PowerShell)
+#### Windows PowerShell
 
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 ```
 
-#### Windows (cmd)
+#### Windows cmd
 
 ```cmd
 python -m venv .venv
@@ -104,14 +104,12 @@ python -m venv .venv
 
 ### 3. Install Python dependencies
 
-You can install the packages manually:
-
 ```bash
 pip install --upgrade pip
-pip install -r requirements.txt
+pip install -r requirements_SpecTwin.txt
 ```
 
-If you do not yet have a `requirements.txt`, use:
+If you do not yet have `requirements_SpecTwin.txt`, install the packages manually:
 
 ```bash
 pip install dearpygui numpy pandas scipy matplotlib plotly pillow h5py silx scikit-optimize xraydb xrt mp-api
@@ -153,19 +151,19 @@ The application expects these files at runtime.
 
 ## Running the application
 
-From the `Source` folder:
+From the repository root:
 
 ```bash
-cd Source
-python StartScreen.py
+python Source/StartScreen.py
 ```
 
 Alternatively, to open the main application directly:
 
 ```bash
-cd Source
-python SpectwinMain.py
+python Source/SpectwinMain.py
 ```
+
+Running from the `Source` folder is also supported.
 
 ---
 
@@ -210,17 +208,24 @@ This repository includes Windows-specific FDMNES binaries under:
 Source/AutoFDMNES/fdmnes_Win64/
 ```
 
-
 ---
 
 ## Materials Project API
 
 The AutoFDMNES module uses the Materials Project API for CIF retrieval.
 
-The key need to enter in mpr.py
+Set your Materials Project API key in the `MP_API_KEY` environment variable before using CIF retrieval.
 
-```text
-Source/AutoFDMNES/mpr.py
+Windows PowerShell:
+
+```powershell
+$env:MP_API_KEY = "your-api-key"
+```
+
+Windows cmd:
+
+```cmd
+set MP_API_KEY=your-api-key
 ```
 
 ---
@@ -228,7 +233,7 @@ Source/AutoFDMNES/mpr.py
 ## Troubleshooting
 
 ### `Font file not found`
-Run the application from the `Source` directory so that relative paths to `fonts/` and `img/` resolve correctly.
+Make sure `Source/fonts/` and `Source/img/` are present in the repository checkout.
 
 ### `ModuleNotFoundError`
 Make sure the virtual environment is activated and all packages are installed.
@@ -246,6 +251,5 @@ Check that `fdmnes_win64.exe` exists in:
 ```text
 Source/AutoFDMNES/fdmnes_Win64/
 ```
-
 
 ## Citation / acknowledgement

@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+.venv/
+venv/
+env/
+
+# Local tooling
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# SpecTwin generated outputs
+Source/results/
+Source/AutoFDMNES/fdmnes_Win64/Sim/*/out/
+Source/AutoFDMNES/fdmnes_Win64/Sim/*/in/*.cif
+Source/AutoFDMNES/fdmnes_Win64/Sim/*/jobs/
+optimization_results.json

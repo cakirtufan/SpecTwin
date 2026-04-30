@@ -7,8 +7,9 @@ Created on Mon Apr 14 10:08:23 2025
 import dearpygui.dearpygui as dpg
 from PIL import Image
 import numpy as np
-import os
 import subprocess
+import sys
+from pathlib import Path
 
 dpg.create_context()
 
@@ -21,20 +22,21 @@ def load_texture(path):
         return dpg.add_static_texture(width, height, data)
 
 
-cwd = os.getcwd()
-print("Current working directory:", cwd)
+source_dir = Path(__file__).resolve().parent
+print("Source directory:", source_dir)
 
 # === File paths ===
-base_path_image = os.path.join(cwd, "img")
-bam_path = os.path.join(base_path_image, "bam_logo.png")
-ifw_path = os.path.join(base_path_image, "ifw_logo.png")
-spectwin_logo_path = os.path.join(base_path_image, "spectwin_logo.png")
-base_path_font = os.path.join(cwd, "fonts")
-verdana_font_path = os.path.join(base_path_font, "verdana.ttf")
+base_path_image = source_dir / "img"
+bam_path = base_path_image / "bam_logo.png"
+ifw_path = base_path_image / "ifw_logo.png"
+spectwin_logo_path = base_path_image / "spectwin_logo.png"
+base_path_font = source_dir / "fonts"
+verdana_font_path = base_path_font / "verdana.ttf"
 
 # === Check files ===
 for path in [bam_path, ifw_path, spectwin_logo_path, verdana_font_path]:
-    assert os.path.exists(path), f"File not found: {path}"
+    if not path.exists():
+        raise FileNotFoundError(f"File not found: {path}")
 
 # === Load textures ===
 bam_tex = load_texture(bam_path)
@@ -43,7 +45,7 @@ spectwin_tex = load_texture(spectwin_logo_path)
 
 # === Load Verdana Font ===
 with dpg.font_registry():
-    verdana_font = dpg.add_font(verdana_font_path, 18)
+    verdana_font = dpg.add_font(str(verdana_font_path), 18)
 
 # === White background theme ===
 with dpg.theme() as white_theme:
@@ -51,7 +53,7 @@ with dpg.theme() as white_theme:
         dpg.add_theme_color(dpg.mvThemeCol_WindowBg, (255, 255, 255), category=dpg.mvThemeCat_Core)
 
 def launch_specwin():
-    subprocess.Popen(["python", "SpectwinMain.py"])
+    subprocess.Popen([sys.executable, str(source_dir / "SpectwinMain.py")], cwd=source_dir)
     dpg.destroy_context()  # Optional: closes the start screen
 
 
@@ -91,8 +93,8 @@ dpg.create_viewport(
     title='SpecTwin',
     width=750,
     height=400,
-    small_icon=icon_path,
-    large_icon=icon_path
+    small_icon=str(icon_path),
+    large_icon=str(icon_path)
 )
 dpg.setup_dearpygui()
 

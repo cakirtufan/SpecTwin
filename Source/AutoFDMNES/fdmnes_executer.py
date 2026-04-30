@@ -14,6 +14,7 @@ from create_master_inp import create_master_inp
 import subprocess
 import os, re, glob
 import time
+from pathlib import Path
 
 
 class FDMNES_executer:
@@ -41,7 +42,7 @@ class FDMNES_executer:
         #   conv_out_name="C:/.../out_conv.txt" -> exact path used
         self.conv_out_name = conv_out_name
 
-        self.cwd = exe_root if exe_root is not None else os.getcwd()
+        self.cwd = exe_root if exe_root is not None else str(Path(__file__).resolve().parent)
 
         self.fdmfile_path = fdmfile_path if fdmfile_path is not None else os.path.join(
             self.cwd, "fdmnes_Win64", "fdmfile.txt"
@@ -167,9 +168,6 @@ class FDMNES_executer:
 
     def run_simulation(self):
         fdm_dir = os.path.join(self.cwd, "fdmnes_Win64")
-
-        # Run from fdmnes_Win64
-        os.chdir(fdm_dir)
 
         try:
             if self.verbose:

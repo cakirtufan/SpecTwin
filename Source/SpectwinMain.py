@@ -5,38 +5,38 @@ Created on Mon Apr 14 11:38:58 2025
 """
 
 import dearpygui.dearpygui as dpg
-import os
 import sys
+from pathlib import Path
 
 # === Add DigitalTwin module to path ===
-cwd = os.getcwd()
+source_dir = Path(__file__).resolve().parent
 
-digital_twin_path = os.path.join(cwd, "DigitalTwin")
+digital_twin_path = str(source_dir / "DigitalTwin")
 if digital_twin_path not in sys.path:
     sys.path.append(digital_twin_path)
 from DigitalTwinUI import DigitalTwinUI
 
-data_visu_path = os.path.join(cwd, "DataVisualization")
+data_visu_path = str(source_dir / "DataVisualization")
 if data_visu_path not in sys.path:
     sys.path.append(data_visu_path)
 from DataVisualizationUI import DataVisualizationUI  # <-- from your custom location
 
-data_allign_path = os.path.join(cwd, "DataAlligning")
+data_allign_path = str(source_dir / "DataAlligning")
 if data_allign_path not in sys.path:
     sys.path.append(data_allign_path)
 from DataProcessUI import DataProcessUI
 
-data_sub_path = os.path.join(cwd, "SubPixel")
+data_sub_path = str(source_dir / "SubPixel")
 if data_sub_path not in sys.path:
     sys.path.append(data_sub_path)
 from EvtAnalyzerUI import EvtAnalyzerDPG
 
-data_sub_path = os.path.join(cwd, "MergeData")
+data_sub_path = str(source_dir / "MergeData")
 if data_sub_path not in sys.path:
     sys.path.append(data_sub_path)
 from MergeDataUI import MergeDataUI
 
-autofdmnes_path = os.path.join(cwd, "AutoFDMNES")
+autofdmnes_path = str(source_dir / "AutoFDMNES")
 if autofdmnes_path not in sys.path:
     sys.path.append(autofdmnes_path)
 from AutoFDMNESUI import AutoFDMNESUI
@@ -44,12 +44,13 @@ from AutoFDMNESUI import AutoFDMNESUI
 # === Setup DearPyGui ===
 dpg.create_context()
 
-base_path_font = os.path.join(cwd, "fonts")
-font_path = os.path.join(base_path_font, "verdana.ttf")
-assert os.path.exists(font_path), f"Font file not found: {font_path}"
+base_path_font = source_dir / "fonts"
+font_path = base_path_font / "verdana.ttf"
+if not font_path.exists():
+    raise FileNotFoundError(f"Font file not found: {font_path}")
 
 with dpg.font_registry():
-    verdana = dpg.add_font(font_path, 18)
+    verdana = dpg.add_font(str(font_path), 18)
 
 
 # === Callbacks ===
