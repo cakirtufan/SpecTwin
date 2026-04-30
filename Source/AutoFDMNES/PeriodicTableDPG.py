@@ -76,12 +76,18 @@ class PeriodicTableDPG:
 
         if self.exclusion_mode:
             if element in self.excluded_elements:
+                self.excluded_elements.pop(element, None)
+                dpg.bind_item_theme(btn_id, 0)
                 return
+            self.included_elements.pop(element, None)
             self.excluded_elements[element] = True
             dpg.bind_item_theme(btn_id, self.theme_red)
         else:
             if element in self.included_elements:
+                self.included_elements.pop(element, None)
+                dpg.bind_item_theme(btn_id, 0)
                 return
+            self.excluded_elements.pop(element, None)
             self.included_elements[element] = True
             dpg.bind_item_theme(btn_id, self.theme_green)
 

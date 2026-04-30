@@ -129,3 +129,22 @@ def test_core_modules_can_be_reopened_without_duplicate_tags():
                 assert child_count > 0, label
     finally:
         dpg.destroy_context()
+
+
+def test_autofdmnes_periodic_table_buttons_toggle_off():
+    periodic_module = load_module("PeriodicTableDPG_toggle", SOURCE_DIR / "AutoFDMNES" / "PeriodicTableDPG.py")
+
+    dpg.create_context()
+    try:
+        with dpg.window(tag="periodic_parent"):
+            table = periodic_module.PeriodicTableDPG("periodic_parent")
+
+        table.toggle_element("Fe")
+        assert table.get_included_elements() == ["Fe"]
+        assert dpg.get_item_theme(table.element_buttons["Fe"]) == table.theme_green
+
+        table.toggle_element("Fe")
+        assert table.get_included_elements() == []
+        assert dpg.get_item_theme(table.element_buttons["Fe"]) is None
+    finally:
+        dpg.destroy_context()
