@@ -167,6 +167,33 @@ Running from the `Source` folder is also supported.
 
 ---
 
+## Testing
+
+Install the test dependencies:
+
+```bash
+pip install -r requirements-dev.txt
+```
+
+Run the default smoke tests:
+
+```bash
+pytest
+```
+
+These tests parse the Python sources and build the Dear PyGui start screen and main module views without showing a viewport.
+
+To run the optional Windows GUI click-through test, install `pywinauto` and opt in explicitly:
+
+```powershell
+$env:RUN_GUI_SMOKE = "1"
+pytest -m gui
+```
+
+The GUI smoke test opens `StartScreen.py`, clicks **Launch SpecTwin**, then clicks through the main navigation buttons.
+
+---
+
 ## Modules
 
 ### Start screen

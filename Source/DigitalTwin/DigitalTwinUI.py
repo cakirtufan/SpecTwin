@@ -44,8 +44,11 @@ class DigitalTwinUI:
         self._conv_y = []
         self._conv_best = []
 
-        with dpg.texture_registry(tag="texture_reg", show=False):
-            pass
+        if dpg.does_item_exist("texture_reg"):
+            dpg.delete_item("texture_reg", children_only=True)
+        else:
+            with dpg.texture_registry(tag="texture_reg", show=False):
+                pass
 
         with dpg.group(horizontal=True, parent=self.parent):
 
