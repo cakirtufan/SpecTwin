@@ -82,7 +82,7 @@ Main Python dependencies used by the project include:
 ### 1. Clone the repository
 
 ```bash
-git clone <your-gitlab-repo-url>
+git clone <https://github.com/cakirtufan/SpecTwin.git>
 cd SpecTwin
 ```
 
