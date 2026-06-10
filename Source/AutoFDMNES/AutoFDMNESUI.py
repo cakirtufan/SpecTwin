@@ -5,6 +5,9 @@ Created on Wed Sep 24 13:48:24 2025
 @author: ccakir
 """
 
+import sys
+from pathlib import Path
+
 import dearpygui.dearpygui as dpg
 import os
 import shutil
@@ -17,6 +20,12 @@ from Xraydb import XrayDBHandler
 
 from fdmnes_executer import FDMNES_executer
 # from plot_ import PlotClass
+
+source_dir = Path(__file__).resolve().parents[1]
+if str(source_dir) not in sys.path:
+    sys.path.append(str(source_dir))
+
+from UI import theme as ui_theme
 
 
 class AutoFDMNESUI:
@@ -65,12 +74,22 @@ class AutoFDMNESUI:
             with dpg.tab(label="Edges / CIF", tag="tab_edge"):
                 dpg.add_text("Select element edges and formulas")
                 dpg.add_separator()
+                self._add_empty_state(
+                    "tab_edge",
+                    "Choose elements in Materials, then confirm them to load edge and CIF options.",
+                    "autofdmnes_edge_empty",
+                )
                 self.edge_panel = None
 
             # --- Parameters ---
             with dpg.tab(label="Parameters", tag="tab_params"):
                 dpg.add_text("Set FDMNES simulation parameters and save the job inputs")
                 dpg.add_separator()
+                self._add_empty_state(
+                    "tab_params",
+                    "Complete Edges / CIF first. Parameters are generated from the selected material data.",
+                    "autofdmnes_params_empty",
+                )
                 self.param_panel = None
 
             # --- Run / Peaks ---
@@ -90,7 +109,7 @@ class AutoFDMNESUI:
                 with dpg.group(horizontal=True, parent="tab_sim"):
 
                     # LEFT: XANES (convolved) plot
-                    with dpg.child_window(width=760, height=620, border=False):
+                    with dpg.child_window(width=590, height=620, border=False):
                         dpg.add_text("XANES (convolved): out_conv.txt")
                         dpg.add_separator()
                         with dpg.plot(height=560, width=-1, tag="plot_exafs"):
@@ -99,9 +118,14 @@ class AutoFDMNESUI:
 
                     # RIGHT: XES plot + peak picking
                     with dpg.child_window(width=-1, height=620, border=False):
-                        dpg.add_text("XES: photon_conv_calc*.txt (Shift+Click to pick peak)")
+                        dpg.add_text("XES: photon_conv_calc*.txt")
+                        dpg.add_text(
+                            "Shift+Click picks peaks when pick mode is enabled.",
+                            color=ui_theme.rgba("text_secondary"),
+                            wrap=360,
+                        )
                         dpg.add_separator()
-                        with dpg.plot(height=430, width=-1, tag="plot_xes"):
+                        with dpg.plot(height=400, width=-1, tag="plot_xes"):
                             dpg.add_plot_axis(dpg.mvXAxis, label="Energy", tag="ax_xes_x")
                             dpg.add_plot_axis(dpg.mvYAxis, label="Intensity", tag="ax_xes_y")
 
@@ -114,17 +138,22 @@ class AutoFDMNESUI:
                         self.xes_peak_drawlayer = dpg.add_draw_layer(parent="plot_xes")
 
                         # controls
+                        self.chk_pick_mode = dpg.add_checkbox(label="Peak pick mode", default_value=False)
                         with dpg.group(horizontal=True):
-                            self.chk_pick_mode = dpg.add_checkbox(label="Peak pick mode", default_value=False)
-                            dpg.add_button(label="Clear peaks", callback=self.clear_xes_peaks)
-                            dpg.add_button(label="Remove selected", callback=self.remove_selected_xes_peak)
-                            dpg.add_button(label="Send peaks to Digital Twin", callback=self.send_peaks_to_digital_twin)
+                            dpg.add_button(label="Clear peaks", width=150, callback=self.clear_xes_peaks)
+                            dpg.add_button(label="Remove selected", width=170, callback=self.remove_selected_xes_peak)
+                        dpg.add_button(label="Send peaks to Digital Twin", callback=self.send_peaks_to_digital_twin, width=-1)
 
 
 
                         # peak table
                         self.xes_peak_table_parent = dpg.add_group()
                         self._rebuild_xes_peak_table(parent=self.xes_peak_table_parent)
+
+    def _add_empty_state(self, parent, text, tag):
+        with dpg.child_window(parent=parent, tag=tag, width=-1, height=96, border=True, no_scrollbar=True):
+            dpg.add_spacer(height=8)
+            dpg.add_text(text, color=ui_theme.rgba("text_secondary"), wrap=760)
 
     # -------------------------
     # Step 1 -> Step 2
@@ -139,6 +168,8 @@ class AutoFDMNESUI:
 
         # Create EdgeSelectionDPG once, then refresh it.
         if self.edge_panel is None:
+            if dpg.does_item_exist("autofdmnes_edge_empty"):
+                dpg.delete_item("autofdmnes_edge_empty")
             self.edge_panel = EdgeSelectionDPG(
                 parent="tab_edge",
                 included_elements=self.included_elements,
@@ -163,6 +194,8 @@ class AutoFDMNESUI:
 
         edge_data = self.edge_panel.get_data_set()
         self.simulation_data = edge_data
+        if dpg.does_item_exist("autofdmnes_params_empty"):
+            dpg.delete_item("autofdmnes_params_empty")
 
         # (basit olsun) her confirm'de yeniden kur
         self.param_panel = SimulationParamsDPG(
@@ -422,8 +455,8 @@ class AutoFDMNESUI:
             I = p["I"]
 
             # draw peak markers
-            dpg.draw_line((E, 0.0), (E, I), color=(255, 0, 0, 255), thickness=1.0, parent=self.xes_peak_drawlayer)
-            dpg.draw_circle((E, I), radius=4, color=(255, 0, 0, 255), fill=(255, 0, 0, 120), parent=self.xes_peak_drawlayer)
+            dpg.draw_line((E, 0.0), (E, I), color=ui_theme.rgba("secondary"), thickness=1.0, parent=self.xes_peak_drawlayer)
+            dpg.draw_circle((E, I), radius=4, color=ui_theme.rgba("secondary"), fill=ui_theme.rgba("secondary", 120), parent=self.xes_peak_drawlayer)
 
             # table row
             with dpg.table_row(parent=self.xes_peak_table):

@@ -11,6 +11,14 @@ import numpy as np
 import re
 import itertools
 import os
+import sys
+from pathlib import Path
+
+source_dir = Path(__file__).resolve().parents[1]
+if str(source_dir) not in sys.path:
+    sys.path.append(str(source_dir))
+
+from UI import theme as ui_theme
 
 # --- Parsing function ---
 def parse_evt_to_dataframe(filename, n=None):
@@ -66,14 +74,24 @@ class EvtAnalyzerDPG:
 
     def _build_ui(self):
         with dpg.child_window(parent=self.parent, autosize_x=True, autosize_y=True):
+            ui_theme.add_section_title("Sub-pixel event analysis")
             dpg.add_button(label="Select .evt file...", callback=self._select_file)
             self.file_display = dpg.add_text(default_value="No .evt file selected...")
+            dpg.add_spacer(height=8)
 
             with dpg.group(horizontal=True):
-                self.e_min = dpg.add_input_float(label="E Min", default_value=4000.0, width=200)
-                self.e_max = dpg.add_input_float(label="E Max", default_value=5000.0, width=200)
-                self.bin_width = dpg.add_input_float(label="Bin-Width (cx/cy)", default_value=1.0, width=200)
-                self.max_lines = dpg.add_input_int(label="Max Lines (all lines = -1)", default_value=10000, width=200)
+                with dpg.group():
+                    dpg.add_text("E Min", color=ui_theme.rgba("text_secondary"))
+                    self.e_min = dpg.add_input_float(label="", default_value=4000.0, width=180)
+                with dpg.group():
+                    dpg.add_text("E Max", color=ui_theme.rgba("text_secondary"))
+                    self.e_max = dpg.add_input_float(label="", default_value=5000.0, width=180)
+                with dpg.group():
+                    dpg.add_text("Bin Width (cx/cy)", color=ui_theme.rgba("text_secondary"))
+                    self.bin_width = dpg.add_input_float(label="", default_value=1.0, width=180)
+                with dpg.group():
+                    dpg.add_text("Max Lines", color=ui_theme.rgba("text_secondary"))
+                    self.max_lines = dpg.add_input_int(label="", default_value=10000, width=180)
                 
             with dpg.group(horizontal=True):  
             
@@ -82,18 +100,18 @@ class EvtAnalyzerDPG:
 
             with dpg.group(horizontal=True):
                 with dpg.group():
-                    with dpg.plot(label="x vs y Histogram", height=600, width=600) as self.plot_xy:
+                    with dpg.plot(label="x vs y Histogram", height=460, width=460) as self.plot_xy:
                         self.ax_xy_x = dpg.add_plot_axis(dpg.mvXAxis, label="x", tag = "x_x_axis")
                         self.ax_xy_y = dpg.add_plot_axis(dpg.mvYAxis, label="y", tag = "y_y_axis")
-                    with dpg.plot(label="x-Histogram (1D)", height=250, width=600) as self.plot_xy_proj:
+                    with dpg.plot(label="x-Histogram (1D)", height=180, width=460) as self.plot_xy_proj:
                         self.ax_xy_proj_x = dpg.add_plot_axis(dpg.mvXAxis, label="x", tag = "x_x_axis1D")
                         self.ax_xy_proj_y = dpg.add_plot_axis(dpg.mvYAxis, label="Counts", tag = "y_y_axis1D")
 
                 with dpg.group():
-                    with dpg.plot(label="cx vs cy Histogram", height=600, width=600) as self.plot_cxcy:
+                    with dpg.plot(label="cx vs cy Histogram", height=460, width=460) as self.plot_cxcy:
                         self.ax_cxcy_x = dpg.add_plot_axis(dpg.mvXAxis, label="cx", tag = "cx_cx_axis")
                         self.ax_cxcy_y = dpg.add_plot_axis(dpg.mvYAxis, label="cy", tag = "cy_cy_axis")
-                    with dpg.plot(label="cx-Histogram (1D)", height=250, width=600) as self.plot_cxcy_proj:
+                    with dpg.plot(label="cx-Histogram (1D)", height=180, width=460) as self.plot_cxcy_proj:
                         self.ax_cxcy_proj_x = dpg.add_plot_axis(dpg.mvXAxis, label="cx", tag = "cx_cx_axis1D")
                         self.ax_cxcy_proj_y = dpg.add_plot_axis(dpg.mvYAxis, label="Counts", tag = "cy_cy_axis1D")
 

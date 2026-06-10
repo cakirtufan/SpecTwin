@@ -11,6 +11,8 @@ import sys
 from pathlib import Path
 
 source_dir = Path(__file__).resolve().parents[1]
+if str(source_dir) not in sys.path:
+    sys.path.append(str(source_dir))
 utils_path = str(source_dir / "Utils")
 if utils_path not in sys.path:
     sys.path.append(utils_path)
@@ -19,6 +21,7 @@ from HDF5Reader import HDF5Reader
 from XRFAnalyzer import XRFAnalyzer
 
 import dearpygui.dearpygui as dpg
+from UI import theme as ui_theme
 
 class DataVisualizationUI:
     def __init__(self, parent):
@@ -50,29 +53,34 @@ class DataVisualizationUI:
             with dpg.group(horizontal=True):
 
                 # === Left panel ===
-                with dpg.child_window(width=380, height=-1):
-                    dpg.add_input_text(label="Element", tag=self.element_entry_tag, width=200)
+                with dpg.child_window(width=340, height=-1):
+                    ui_theme.add_section_title("Data selection")
+                    dpg.add_text("Element", color=ui_theme.rgba("text_secondary"))
+                    dpg.add_input_text(label="", tag=self.element_entry_tag, width=-1, hint="e.g., Fe")
 
+                    dpg.add_text("Emission Line", color=ui_theme.rgba("text_secondary"))
                     dpg.add_combo(
-                        label="Emission Line",
+                        label="",
                         items=["K_alpha", "K_beta", "K_alpha + K_beta"],
-                        default_value="K_alpha", width=200,
+                        default_value="K_alpha", width=-1,
                         tag=self.emission_combo_tag
                     )
 
-                    dpg.add_input_text(label="Detector Channel", tag=self.channel_display_tag, readonly=True, width=200)
+                    dpg.add_text("Detector Channel", color=ui_theme.rgba("text_secondary"))
+                    dpg.add_input_text(label="", tag=self.channel_display_tag, readonly=True, width=-1)
+                    dpg.add_spacer(height=8)
 
                     dpg.add_listbox(
                         tag=self.file_listbox_tag,
                         items=self.file_list,
                         width=-1,
-                        num_items=38
+                        num_items=12
                     )
 
                     with dpg.group(horizontal=True):
                         dpg.add_button(label="Select .h5 File", callback=lambda: dpg.show_item(self.file_dialog_tag))
                         dpg.add_button(label="Read Data", callback=self.read_and_plot_data)
-                        dpg.add_button(label="Clear Canvas", callback=self.clear_canvas)
+                    dpg.add_button(label="Clear Canvas", width=-1, callback=self.clear_canvas)
 
                 # === Right panel (plot) ===
                 with dpg.child_window(width=-1, height=-1):

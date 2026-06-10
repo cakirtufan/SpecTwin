@@ -5,7 +5,16 @@ Created on Wed Sep 24 13:58:21 2025
 @author: ccakir
 """
 
+import sys
+from pathlib import Path
+
 import dearpygui.dearpygui as dpg
+
+source_dir = Path(__file__).resolve().parents[1]
+if str(source_dir) not in sys.path:
+    sys.path.append(str(source_dir))
+
+from UI import theme as ui_theme
 
 
 class PeriodicTableDPG:
@@ -15,8 +24,9 @@ class PeriodicTableDPG:
         self.element_buttons = {}
         self.exclusion_mode = False  
 
-        self.theme_green = self.make_button_theme((0, 200, 0))      # included
-        self.theme_red = self.make_button_theme((200, 0, 0))        # excluded
+        item_themes = ui_theme.build_item_themes()
+        self.theme_green = item_themes["included_button"]      # included
+        self.theme_red = item_themes["excluded_button"]        # excluded
 
         self.periodic_table_layout = [
             ['H', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 'He'],
@@ -62,13 +72,6 @@ class PeriodicTableDPG:
         def callback(sender, app_data):
             self.toggle_element(element, sender, app_data)
         return callback
-
-    # --- Themes ---
-    def make_button_theme(self, color):
-        with dpg.theme() as theme_id:
-            with dpg.theme_component(dpg.mvButton):
-                dpg.add_theme_color(dpg.mvThemeCol_Button, color, category=dpg.mvThemeCat_Core)
-        return theme_id
 
     # === Button logic ===
     def toggle_element(self, element, sender=None, app_data=None):

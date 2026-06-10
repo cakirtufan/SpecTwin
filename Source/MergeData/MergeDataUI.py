@@ -12,12 +12,15 @@ import dearpygui.dearpygui as dpg
 import numpy as np
 
 source_dir = Path(__file__).resolve().parents[1]
+if str(source_dir) not in sys.path:
+    sys.path.append(str(source_dir))
 utils_path = str(source_dir / "Utils")
 if utils_path not in sys.path:
     sys.path.append(utils_path)
 
 from XRFAnalyzer import XRFAnalyzer
 from HDF5Reader import HDF5Reader
+from UI import theme as ui_theme
 
 
 class MergeDataUI:
@@ -55,8 +58,8 @@ class MergeDataUI:
             with dpg.group(horizontal=True):
 
                 # Left panel
-                with dpg.child_window(width=380, height=-1):
-                    dpg.add_text("Scan directory for files")
+                with dpg.child_window(width=360, height=-1):
+                    ui_theme.add_section_title("Scan directory")
 
                     dpg.add_radio_button(
                         items=[".h5", ".evt"], default_value=".h5",
@@ -82,7 +85,7 @@ class MergeDataUI:
                     dpg.add_spacer(height=8)
                     dpg.add_text("Found files:")
                     self.listbox_tag = dpg.add_listbox(
-                        items=[], num_items=10, width=-1,
+                        items=[], num_items=8, width=-1,
                         callback=self._on_file_select,
                         tag=f"{self.prefix}_listbox"
                     )
@@ -97,24 +100,27 @@ class MergeDataUI:
                     dpg.add_separator()
                     dpg.add_spacer(height=6)
 
-                    dpg.add_text("Detector channel range from element/line")
+                    ui_theme.add_section_title("Detector channel")
+                    dpg.add_text("Element", color=ui_theme.rgba("text_secondary"))
                     dpg.add_input_text(
-                        label="Element", tag=self.element_entry_tag,
-                        width=200, hint="e.g., Fe", on_enter=True,
+                        label="", tag=self.element_entry_tag,
+                        width=-1, hint="e.g., Fe", on_enter=True,
                         callback=self._on_channel_inputs_changed
                     )
 
+                    dpg.add_text("Emission Line", color=ui_theme.rgba("text_secondary"))
                     dpg.add_combo(
-                        label="Emission Line",
+                        label="",
                         items=["K_alpha", "K_beta", "K_alpha + K_beta"],
-                        default_value="K_alpha", width=200,
+                        default_value="K_alpha", width=-1,
                         tag=self.emission_combo_tag,
                         callback=self._on_channel_inputs_changed
                     )
 
+                    dpg.add_text("Detector Channel", color=ui_theme.rgba("text_secondary"))
                     dpg.add_input_text(
-                        label="Detector Channel",
-                        tag=self.channel_display_tag, readonly=True, width=200
+                        label="",
+                        tag=self.channel_display_tag, readonly=True, width=-1
                     )
 
                     with dpg.group(horizontal=True):

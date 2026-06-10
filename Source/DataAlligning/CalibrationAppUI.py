@@ -5,12 +5,21 @@ Created on Mon May  5 11:37:21 2025
 @author: ccakir
 """
 
+import sys
+from pathlib import Path
+
 import dearpygui.dearpygui as dpg
 import os
 import numpy as np
 import XRFAnalyzer
 from HDF5Reader import HDF5Reader
 from scipy.optimize import curve_fit
+
+source_dir = Path(__file__).resolve().parents[1]
+if str(source_dir) not in sys.path:
+    sys.path.append(str(source_dir))
+
+from UI import theme as ui_theme
 
 class CalibrationUI:
     def __init__(self, parent_tag, parent_app=None):
@@ -46,29 +55,29 @@ class CalibrationUI:
         with dpg.group(parent=self.parent_tag):
             with dpg.group(horizontal=True):
                 # === File Selection Panel ===
-                with dpg.child_window(width=300, height=190):
+                with dpg.child_window(width=300, height=230):
                     dpg.add_text("Calibration File")
                     dpg.add_button(label="Select File", callback=self.select_calibration_file)
                     self.file_label = dpg.add_text(default_value="No file selected", wrap=280)
                     dpg.add_text("Detector Channel Range")
-                    self.channel_display = dpg.add_input_text(default_value="", readonly=True, width=200)
+                    self.channel_display = dpg.add_input_text(default_value="", readonly=True, width=-1)
 
                 # === Parameters Panel ===
-                with dpg.child_window(width=300, height=190):
+                with dpg.child_window(width=300, height=230):
                     dpg.add_text("Element")
-                    self.element_input = dpg.add_input_text(hint="e.g., Fe", width=100)
+                    self.element_input = dpg.add_input_text(hint="e.g., Fe", width=-1)
 
                     dpg.add_text("Emission Line")
                     self.emission_combo = dpg.add_combo(
                         items=["K_alpha", "K_beta", "K_alpha + K_beta"],
                         default_value="K_alpha",
-                        width=150
+                        width=-1
                     )
 
-                    dpg.add_button(label="Calculate & Read Data", callback=self.process_data)
+                    dpg.add_button(label="Calculate & Read Data", width=-1, callback=self.process_data)
 
                 # === Peak Table ===
-                with dpg.child_window(width=-1, height=190):
+                with dpg.child_window(width=-1, height=230):
                     with dpg.table(header_row=True, resizable=True, policy=dpg.mvTable_SizingStretchProp,
                                    borders_innerH=True, borders_innerV=True, borders_outerH=True, borders_outerV=True,
                                    row_background=True, tag="peak_table"):
@@ -99,8 +108,8 @@ class CalibrationUI:
 
                     with dpg.theme(tag="selected_scatter_theme"):
                         with dpg.theme_component(dpg.mvScatterSeries):
-                            dpg.add_theme_color(dpg.mvPlotCol_Line, (255, 165, 0, 255), category=dpg.mvThemeCat_Plots)
-                            dpg.add_theme_color(dpg.mvPlotCol_Fill, (255, 165, 0, 255), category=dpg.mvThemeCat_Plots)
+                            dpg.add_theme_color(dpg.mvPlotCol_Line, ui_theme.rgba("secondary"), category=dpg.mvThemeCat_Plots)
+                            dpg.add_theme_color(dpg.mvPlotCol_Fill, ui_theme.rgba("secondary"), category=dpg.mvThemeCat_Plots)
 
                     dpg.bind_item_theme(self.selected_series, "selected_scatter_theme")
 
@@ -111,9 +120,9 @@ class CalibrationUI:
         # Theme for Align button
         with dpg.theme(tag="align_green_theme"):
             with dpg.theme_component(dpg.mvButton):
-                dpg.add_theme_color(dpg.mvThemeCol_Button, (0, 200, 0, 255))
-                dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered, (0, 220, 0, 255))
-                dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, (0, 180, 0, 255))
+                dpg.add_theme_color(dpg.mvThemeCol_Button, ui_theme.rgba("success"))
+                dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered, (75, 207, 148, 255))
+                dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, (43, 148, 101, 255))
 
     # === File handling ===
     def select_calibration_file(self):

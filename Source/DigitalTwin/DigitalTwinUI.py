@@ -5,12 +5,21 @@ Created on Wed Apr 16 15:16:15 2025
 @author: ccakir
 """
 
+import sys
+from pathlib import Path
+
 import dearpygui.dearpygui as dpg
 import os
 import glob
 import json
 import threading
 import numpy as np
+
+source_dir = Path(__file__).resolve().parents[1]
+if str(source_dir) not in sys.path:
+    sys.path.append(str(source_dir))
+
+from UI import theme as ui_theme
 
 from XrayDBHandler import XrayDBHandler
 from CrystalSelector import CrystalSelector
@@ -69,16 +78,19 @@ class DigitalTwinUI:
     def _build_lines_tab(self):
         dpg.add_spacer(height=8)
         with dpg.group(horizontal=True):
-            with dpg.child_window(width=500, height=560, border=False):
+            with dpg.child_window(width=420, height=560, border=False):
                 dpg.add_text("Select Emission Lines")
                 dpg.add_separator()
+                dpg.add_text("Element")
                 self.element_combo = dpg.add_combo(
                     self.xray_db.get_elements(),
-                    label="Element",
+                    width=-1,
                     callback=self.update_shells
                 )
-                self.shell_combo = dpg.add_combo([], label="Shell", callback=self.update_lines)
-                self.line_listbox = dpg.add_listbox([], label="Lines", num_items=6)
+                dpg.add_text("Shell")
+                self.shell_combo = dpg.add_combo([], width=-1, callback=self.update_lines)
+                dpg.add_text("Lines")
+                self.line_listbox = dpg.add_listbox([], num_items=6, width=-1)
 
                 dpg.add_separator()
                 dpg.add_text("Route selected lines")
@@ -92,76 +104,79 @@ class DigitalTwinUI:
                     dpg.add_button(label="Clear Opt", callback=self.clear_opt_energies)
                     dpg.add_button(label="Deselect", callback=self.deselect_all)
 
-            with dpg.child_window(width=24, height=560, border=False):
-                dpg.add_spacer(width=12)
+            with dpg.child_window(width=12, height=560, border=False):
+                dpg.add_spacer(width=4)
 
-            with dpg.child_window(width=540, height=560, border=False):
+            with dpg.child_window(width=500, height=560, border=False):
                 dpg.add_text("Simulation Line Set")
                 dpg.add_separator()
-
+                dpg.add_text("Lines used for xrt simulation", color=ui_theme.rgba("text_muted"))
                 self.result_text_sim = dpg.add_input_text(
                     multiline=True,
                     readonly=True,
-                    width=520,
+                    width=-1,
                     height=430,
-                    label="Lines used for xrt simulation"
                 )
 
-            with dpg.child_window(width=24, height=560, border=False):
-                dpg.add_spacer(width=12)
+            with dpg.child_window(width=12, height=560, border=False):
+                dpg.add_spacer(width=4)
 
-            with dpg.child_window(width=540, height=560, border=False):
+            with dpg.child_window(width=-1, height=560, border=False):
                 dpg.add_text("Optimization Target Set")
                 dpg.add_separator()
+                dpg.add_text("Lines optimized / matched", color=ui_theme.rgba("text_muted"))
                 self.result_text_opt = dpg.add_input_text(
                     multiline=True,
                     readonly=True,
-                    width=520,
+                    width=-1,
                     height=430,
-                    label="Lines optimized / matched"
                 )
 
     def _build_simulation_setup_tab(self):
         dpg.add_spacer(height=8)
         with dpg.group(horizontal=True):
-            with dpg.child_window(width=560, height=520, border=False):
+            with dpg.child_window(width=460, height=520, border=False):
                 dpg.add_text("Spectrometer Setup")
                 dpg.add_separator()
 
-                self.crystal_combo_sim = dpg.add_combo(self.crystals.crystals, label="Crystal")
+                dpg.add_text("Crystal")
+                self.crystal_combo_sim = dpg.add_combo(self.crystals.crystals, width=-1)
+                dpg.add_text("hkl")
                 self.hkl_input_sim = dpg.add_input_text(
-                    label="hkl",
                     default_value="1,1,1",
-                    hint="e.g. 1,1,1"
+                    hint="e.g. 1,1,1",
+                    width=-1,
                 )
 
+                dpg.add_text("Crystal Info")
                 self.crystal_info = dpg.add_input_text(
                     multiline=True,
                     readonly=True,
-                    width=520,
+                    width=-1,
                     height=130,
-                    label="Crystal Info"
                 )
 
                 dpg.add_button(label="Preview Crystal", callback=self.display_crystal_info)
                 dpg.add_separator()
 
-                self.distance_input = dpg.add_input_float(label="Distance", default_value=110.0)
+                dpg.add_text("Distance")
+                self.distance_input = dpg.add_input_float(default_value=110.0, width=-1)
+                dpg.add_text("Repeats (xrt iterations)")
                 self.num_rep_input = dpg.add_input_int(
-                    label="Repeats (xrt iterations)",
                     default_value=1500,
-                    min_value=1
+                    min_value=1,
+                    width=-1,
                 )
 
                 dpg.add_button(label="Run Simulation", width=180, callback=self.run_simulation)
 
-            with dpg.child_window(width=28, height=520, border=False):
-                dpg.add_spacer(width=12)
+            with dpg.child_window(width=12, height=520, border=False):
+                dpg.add_spacer(width=4)
 
             with dpg.child_window(width=-1, height=520, border=False):
                 dpg.add_text("Simulation Output")
                 dpg.add_separator()
-                dpg.add_text("Use the Lines tab first, then run a simulation to populate the Results tab.", color=(150, 150, 150), wrap=520)
+                dpg.add_text("Use the Lines tab first, then run a simulation to populate the Results tab.", color=ui_theme.rgba("text_muted"), wrap=520)
 
     def _build_optimization_tab(self):
         dpg.add_spacer(height=8)
@@ -211,8 +226,8 @@ class DigitalTwinUI:
                     callback=self.load_peaks_and_start_optimization
                 )
                 dpg.add_separator()
-                dpg.add_text("Selected optimization energies are listed on the Simulation tab.", color=(150, 150, 150), wrap=440)
-                self.opt_hint_text = dpg.add_text("", color=(200, 200, 50), wrap=440)
+                dpg.add_text("Selected optimization energies are listed on the Simulation tab.", color=ui_theme.rgba("text_muted"), wrap=440)
+                self.opt_hint_text = dpg.add_text("", color=ui_theme.rgba("warning"), wrap=440)
 
             with dpg.child_window(width=24, height=560, border=False):
                 dpg.add_spacer(width=12)
@@ -261,7 +276,7 @@ class DigitalTwinUI:
                 )
 
                 dpg.add_separator()
-                self.run_status_text = dpg.add_text("Status: idle", color=(180, 180, 180), wrap=520)
+                self.run_status_text = dpg.add_text("Status: idle", color=ui_theme.rgba("text_secondary"), wrap=520)
 
                 with dpg.group(horizontal=True):
                     dpg.add_button(label="Run Optimization", width=180, callback=self.run_optimization_threaded)
@@ -280,7 +295,7 @@ class DigitalTwinUI:
         with dpg.child_window(width=-1, height=650, border=False, tag="graph_window"):
             dpg.add_text("Results")
             dpg.add_separator()
-            dpg.add_text("No simulation or optimization result yet.", color=(150, 150, 150), wrap=600)
+            dpg.add_text("No simulation or optimization result yet.", color=ui_theme.rgba("text_muted"), wrap=600)
 
     def add_selection_callback(self):
         crystal = dpg.get_value(self.crystal_combo_opt)
@@ -715,7 +730,7 @@ class DigitalTwinUI:
             dpg.add_text("You selected more than 2 target energies.")
             dpg.add_text("Please tick exactly TWO energies to continue.")
             dpg.add_separator()
-            dpg.add_text("", tag="target_picker_status", color=(255, 120, 120), wrap=480)
+            dpg.add_text("", tag="target_picker_status", color=ui_theme.rgba("error"), wrap=480)
 
             for e in self._target_picker_candidates:
                 tag = f"target_chk_{e:.6f}"

@@ -11,6 +11,10 @@ import dearpygui.dearpygui as dpg
 
 # === Add module folders to path ===
 source_dir = Path(__file__).resolve().parent
+if str(source_dir) not in sys.path:
+    sys.path.append(str(source_dir))
+
+from UI import theme as ui_theme
 
 digital_twin_path = str(source_dir / "DigitalTwin")
 if digital_twin_path not in sys.path:
@@ -44,13 +48,7 @@ from AutoFDMNESUI import AutoFDMNESUI
 
 
 def load_default_font():
-    base_path_font = source_dir / "fonts"
-    font_path = base_path_font / "verdana.ttf"
-    if not font_path.exists():
-        raise FileNotFoundError(f"Font file not found: {font_path}")
-
-    with dpg.font_registry():
-        return dpg.add_font(str(font_path), 18)
+    return ui_theme.load_fonts(source_dir)["default"]
 
 
 def show_main_content(label):
@@ -75,7 +73,7 @@ def show_main_content(label):
         AutoFDMNESUI("content_area")
 
     else:
-        dpg.add_text(f"--- {label} Module ---", parent="content_area")
+        ui_theme.add_section_title(f"{label} Module", parent="content_area")
 
 
 def toggle_data_analysis_menu():
@@ -83,28 +81,61 @@ def toggle_data_analysis_menu():
     dpg.configure_item("data_analysis_group", show=not current)
 
 
+def _add_welcome_action(label, description, action):
+    with dpg.child_window(width=300, height=164, border=True, no_scrollbar=True):
+        ui_theme.add_section_title(label)
+        dpg.add_text(description, color=ui_theme.rgba("text_secondary"), wrap=260)
+        dpg.add_spacer(height=8)
+        button = dpg.add_button(label=label, width=-1, callback=action)
+        ui_theme.bind_button_theme(button, "secondary")
+
+
 def build_main_window():
-    verdana = load_default_font()
+    ui_theme.apply_global_theme(source_dir)
 
     with dpg.window(tag="SpecWinWindow", label="SpecTwin", width=1920, height=1080):
-        dpg.bind_font(verdana)
-
         with dpg.group(horizontal=True):
-            with dpg.child_window(width=220, height=-1):
-                dpg.add_text("Menu")
+            with dpg.child_window(width=240, height=-1):
+                ui_theme.add_section_title("SpecTwin")
+                dpg.add_text("Workstation modules", color=ui_theme.rgba("text_muted"))
                 dpg.add_separator()
-                dpg.add_button(label="Digital Twin", callback=lambda: show_main_content("DigitalTwin"))
-                dpg.add_button(label="Auto FDMNES", callback=lambda: show_main_content("AutoFDMNES"))
-                dpg.add_button(label="Data Processes", callback=toggle_data_analysis_menu)
+                digital_btn = dpg.add_button(label="Digital Twin", width=-1, callback=lambda: show_main_content("DigitalTwin"))
+                auto_btn = dpg.add_button(label="AutoFDMNES", width=-1, callback=lambda: show_main_content("AutoFDMNES"))
+                data_btn = dpg.add_button(label="Data Processing", width=-1, callback=toggle_data_analysis_menu)
+                ui_theme.bind_button_theme(digital_btn, "secondary")
+                ui_theme.bind_button_theme(auto_btn, "secondary")
+                ui_theme.bind_button_theme(data_btn, "secondary")
 
                 with dpg.group(tag="data_analysis_group", show=False):
-                    dpg.add_button(label="   Merge Data", callback=lambda: show_main_content("Merge .h5/.evt Files"))
-                    dpg.add_button(label="   Visualize Data", callback=lambda: show_main_content("VisualizeData"))
-                    dpg.add_button(label="   Allign Data", callback=lambda: show_main_content("ProcessData"))
-                    dpg.add_button(label="   Process .evt Data", callback=lambda: show_main_content("SubPixelResolution"))
+                    dpg.add_button(label="  Merge Data", width=-1, callback=lambda: show_main_content("Merge .h5/.evt Files"))
+                    dpg.add_button(label="  Visualize Data", width=-1, callback=lambda: show_main_content("VisualizeData"))
+                    dpg.add_button(label="  Align Data", width=-1, callback=lambda: show_main_content("ProcessData"))
+                    dpg.add_button(label="  Process .evt Data", width=-1, callback=lambda: show_main_content("SubPixelResolution"))
 
             with dpg.child_window(tag="content_area", width=-1, height=-1):
-                dpg.add_text("Welcome to SpecTwin Control Panel")
+                ui_theme.add_section_title("SpecTwin Control Panel")
+                dpg.add_text(
+                    "Select a module from the left rail to begin a simulation, analysis, or data-processing workflow.",
+                    color=ui_theme.rgba("text_secondary"),
+                    wrap=720,
+                )
+                dpg.add_spacer(height=16)
+                with dpg.group(horizontal=True):
+                    _add_welcome_action(
+                        "Digital Twin",
+                        "Configure emission lines, simulate spectrometer geometry, and inspect optimization output.",
+                        lambda: show_main_content("DigitalTwin"),
+                    )
+                    _add_welcome_action(
+                        "AutoFDMNES",
+                        "Select materials, generate FDMNES inputs, run simulations, and route peaks forward.",
+                        lambda: show_main_content("AutoFDMNES"),
+                    )
+                    _add_welcome_action(
+                        "Data Processing",
+                        "Merge, visualize, align, and process spectroscopy files.",
+                        toggle_data_analysis_menu,
+                    )
 
 
 def main():
